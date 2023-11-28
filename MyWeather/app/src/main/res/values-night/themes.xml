@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MyWeather" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorAccent">@color/white</item>
+    </style>
+
+    <style name="Theme.MyWeather" parent="Base.Theme.MyWeather">
+        <item name="colorAccent">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="android:navigationBarColor">@color/common</item>
+    </style>
+</resources>
