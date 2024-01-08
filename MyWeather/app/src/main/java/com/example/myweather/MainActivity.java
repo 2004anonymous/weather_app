@@ -1,12 +1,14 @@
 package com.example.myweather;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding bind;
     RequestQueue queue;
     String baseUrl = "https://api.weatherapi.com/v1/";
-    String requestType, query = "Dibrugarh",url;
+    String requestType, query, url;
     String key = "b97555c325c74f7fa4c71724232311";
     ArrayList<ForecastModel> forecastModels;
     ForecastAdapter adapter;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         bind = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
         queue = Volley.newRequestQueue(this);
+        query = "dibrugarh";
         url = baseUrl+"forecast.json?key="+key+"&q="+query;
         makeJSONRequest(url);
         bind.allForeCast.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,true));
@@ -58,6 +61,22 @@ public class MainActivity extends AppCompatActivity {
                 bind.refreshListener.setRefreshing(false);
             }
         });
+
+        bind.searchV.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String str) {
+                query = str;
+                url = baseUrl+"forecast.json?key="+key+"&q="+query;
+                makeJSONRequest(url);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+        });
+
     }
 
     private String calculateDateFormate(String originalTime){
@@ -79,57 +98,67 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         String name,region, wind_deg, wind_dir,wind_rate, condition, cond_icon, humidity, uv, sunrise, sunset,isDayNight;
 
-                        try {
-                            isDayNight = response.getJSONObject("current").getString("is_day");
-                            humidity = response.getJSONObject("current").getString("humidity");
-                            uv = response.getJSONObject("current").getString("uv");
-                            condition = response.getJSONObject("current").getJSONObject("condition").getString("text");
-                            cond_icon = "https:"+response.getJSONObject("current").getJSONObject("condition").getString("icon");
-                            wind_rate = response.getJSONObject("current").getString("wind_kph");
-                            wind_dir = response.getJSONObject("current").getString("wind_dir");
-                            wind_deg = response.getJSONObject("current").getString("wind_degree");
-                            name = response.getJSONObject("location").getString("name");
-                            region = response.getJSONObject("location").getString("region");
+                        if (response.isNull("error")){
+                            try {
+                                isDayNight = response.getJSONObject("current").getString("is_day");
+                                humidity = response.getJSONObject("current").getString("humidity");
+                                uv = response.getJSONObject("current").getString("uv");
+                                condition = response.getJSONObject("current").getJSONObject("condition").getString("text");
+                                cond_icon = "https:"+response.getJSONObject("current").getJSONObject("condition").getString("icon");
+                                wind_rate = response.getJSONObject("current").getString("wind_kph");
+                                wind_dir = response.getJSONObject("current").getString("wind_dir");
+                                wind_deg = response.getJSONObject("current").getString("wind_degree");
+                                name = response.getJSONObject("location").getString("name");
+                                region = response.getJSONObject("location").getString("region");
 
-                            sunrise = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONObject("astro").getString("sunrise");
-                            sunset = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONObject("astro").getString("sunset");
+                                sunrise = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONObject("astro").getString("sunrise");
+                                sunset = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONObject("astro").getString("sunset");
 
-                            if (Integer.valueOf(isDayNight) == 1){
-                                bind.weatherIcon.setImageResource(R.drawable.cloudy);
-                                bind.conditionStatus.setText(condition+" Day");
-                                Toast.makeText(MainActivity.this, "Day !", Toast.LENGTH_SHORT).show();
-                            }else{
-                                bind.weatherIcon.setImageResource(R.drawable.night_theme);
-                                bind.conditionStatus.setText(condition+" Night");
-                                Toast.makeText(MainActivity.this, "Night !", Toast.LENGTH_SHORT).show();
+                                if (Integer.valueOf(isDayNight) == 1){
+                                    bind.weatherIcon.setImageResource(R.drawable.cloudy);
+                                    bind.conditionStatus.setText(condition+" Day");
+                                    Toast.makeText(MainActivity.this, "Day !", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    bind.weatherIcon.setImageResource(R.drawable.night_theme);
+                                    bind.conditionStatus.setText(condition+" Night");
+                                    Toast.makeText(MainActivity.this, "Night !", Toast.LENGTH_SHORT).show();
+                                }
+                                String for_icon = null;
+                                forecastModels = new ArrayList<>();
+                                int forecastSize = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").length();
+                                for (int i =0;i<forecastSize;i++){
+                                    String for_cond, for_time;
+                                    for_cond = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").getJSONObject(i).getJSONObject("condition").getString("text");
+                                    for_icon = "https:"+response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").getJSONObject(i).getJSONObject("condition").getString("icon");
+                                    for_time = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").getJSONObject(i).getString("time");
+                                    String[] ac_time = for_time.split(" ",2);
+                                    for_time = calculateDateFormate(ac_time[1]);
+                                    forecastModels.add(new ForecastModel(for_icon,for_time, for_cond));
+                                }
+                                Glide.with(MainActivity.this).load(Uri.parse(cond_icon)).into(bind.weatherIcon);
+                                adapter = new ForecastAdapter(MainActivity.this, forecastModels);
+                                bind.allForeCast.setAdapter(adapter);
+                                bind.allForeCast.scrollToPosition(12);
+                                bind.humidityS.setText(humidity+"%");
+                                bind.uvS.setText(uv+" of 10");
+                                bind.sunriseS.setText(sunrise);
+                                bind.sunsetS.setText(sunset);
+                                bind.tmp.setText(response.getJSONObject("current").getString("temp_c")+"°C");
+                                bind.tag.setText(name+", "+region);
+                                bind.windStatus.setText("Winds "+wind_deg+" deg "+wind_dir+" at "+wind_rate+ " km/h");
+                                Glide.with(MainActivity.this).load(Uri.parse(cond_icon)).into(bind.conditionIcon);
+
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
                             }
-
-                            forecastModels = new ArrayList<>();
-                            int forecastSize = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").length();
-                            for (int i =0;i<forecastSize;i++){
-                                String for_cond, for_time, for_icon;
-                                for_cond = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").getJSONObject(i).getJSONObject("condition").getString("text");
-                                for_icon = "https:"+response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").getJSONObject(i).getJSONObject("condition").getString("icon");
-                                for_time = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONArray("hour").getJSONObject(i).getString("time");
-                                String[] ac_time = for_time.split(" ",2);
-                                for_time = calculateDateFormate(ac_time[1]);
-                                forecastModels.add(new ForecastModel(for_icon,for_time, for_cond));
-                            }
-                            adapter = new ForecastAdapter(MainActivity.this, forecastModels);
-                            bind.allForeCast.setAdapter(adapter);
-                            bind.allForeCast.scrollToPosition(12);
-                            bind.humidityS.setText(humidity+"%");
-                            bind.uvS.setText(uv+" of 10");
-                            bind.sunriseS.setText(sunrise);
-                            bind.sunsetS.setText(sunset);
-                            bind.tmp.setText(response.getJSONObject("current").getString("temp_c")+"°C");
-                            bind.tag.setText(name+", "+region);
-                            bind.windStatus.setText("Winds "+wind_deg+" deg "+wind_dir+" at "+wind_rate+ " km/h");
-                            Glide.with(MainActivity.this).load(Uri.parse(cond_icon)).into(bind.conditionIcon);
-
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
+                        }else{
+                            Toast.makeText(MainActivity.this, "No records found !", Toast.LENGTH_SHORT).show();
+//                            bind.refreshListener.setVisibility(View.GONE);
+//                            bind.recordsErrorPage.setVisibility(View.VISIBLE);
                         }
+
+
+
                     }
                 }, new Response.ErrorListener() {
             @Override

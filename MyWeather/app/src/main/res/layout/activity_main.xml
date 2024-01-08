@@ -13,18 +13,16 @@
         android:id="@+id/searchBar">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
             android:layout_width="match_parent"
-            android:layout_toLeftOf="@id/searchIcon"
-            android:layout_height="40dp"
-            android:layout_centerInParent="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/search_view_bg"
-            android:gravity="center"
-            android:paddingEnd="10dp"
+            android:layout_height="50dp"
             app:iconifiedByDefault="false"
-            app:queryHint="search for city..." />
+            android:hint="search for city"
+            app:queryHint="search for city . . ."
+            android:id="@+id/searchV"
+            android:background="@drawable/search_view_bg"
+            android:layout_toLeftOf="@+id/searchIcon"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"/>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="40dp"
@@ -38,7 +36,20 @@
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/recordsErrorPage"
+        android:layout_below="@id/searchBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="No records found !"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:visibility="gone"
+        android:fontFamily="@font/poppins_sb"
+        android:gravity="center"/>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_below="@+id/searchBar"
         android:layout_width="match_parent"
         android:id="@+id/refreshListener"
         android:layout_height="match_parent">
@@ -348,6 +359,7 @@
                 </LinearLayout>
 
             </RelativeLayout>
+
         </ScrollView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
