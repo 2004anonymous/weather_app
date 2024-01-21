@@ -14,7 +14,7 @@
 
         <androidx.appcompat.widget.SearchView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             app:iconifiedByDefault="false"
             android:hint="search for city"
             app:queryHint="search for city . . ."
@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:layout_marginTop="50dp"
+                    android:layout_marginTop="20dp"
                     android:id="@+id/weatherIcon"
                     android:layout_width="match_parent"
                     android:layout_height="200dp" />
@@ -361,6 +361,17 @@
             </RelativeLayout>
 
         </ScrollView>
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <RelativeLayout
+        android:layout_below="@id/searchBar"
+        android:id="@+id/prog_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+    </RelativeLayout>
 </RelativeLayout>
