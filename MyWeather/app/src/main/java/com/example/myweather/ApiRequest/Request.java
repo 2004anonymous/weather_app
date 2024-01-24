@@ -62,13 +62,13 @@ public class Request {
                                 sunset = response.getJSONObject("forecast").getJSONArray("forecastday").getJSONObject(0).getJSONObject("astro").getString("sunset");
 
                                 if (Integer.valueOf(isDayNight) == 1){
-                                    bind.weatherIcon.setImageResource(R.drawable.cloudy);
+//                                    bind.weatherIcon.setImageResource(R.drawable.cloudy);
                                     bind.conditionStatus.setText(condition+" Day");
-                                    Toast.makeText(context, "Day !", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(context, "Day !", Toast.LENGTH_SHORT).show();
                                 }else{
-                                    bind.weatherIcon.setImageResource(R.drawable.night_theme);
+//                                    bind.weatherIcon.setImageResource(R.drawable.night_theme);
                                     bind.conditionStatus.setText(condition+" Night");
-                                    Toast.makeText( context, "Night !", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText( context, "Night !", Toast.LENGTH_SHORT).show();
                                 }
                                 String for_icon = null;
 
@@ -112,6 +112,8 @@ public class Request {
                 if (error.networkResponse.statusCode == 400 ){
                     bind.refreshListener.setVisibility(View.GONE);
                     bind.recordsErrorPage.setVisibility(View.VISIBLE);
+                    bind.errorImage.setImageResource(R.drawable.error);
+                    bind.reloadBtn.setVisibility(View.GONE);
                 }else{
                     Utility.showToast(context, "Error !");
                 }

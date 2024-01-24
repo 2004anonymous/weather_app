@@ -10,9 +10,16 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="colorPrimary">@color/white</item>
         <item name="android:navigationBarColor">@color/white</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
+<!--        <item name="android:windowTranslucentNavigation">true</item>-->
     </style>
 
     <style name="round_frame">
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="searchViewText" parent="Widget.AppCompat.SearchView">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColorHint">#B6B4B4</item>
     </style>
 </resources>
